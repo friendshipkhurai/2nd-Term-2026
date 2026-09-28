@@ -2,7 +2,7 @@
    This emulates google.script.run so the existing FEA pages can run from GitHub Pages.
    Change only API_URL below after deploying the Apps Script backend.
 */
-const FEA_API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+const FEA_API_URL = 'https://script.google.com/macros/s/AKfycbwZLvO2ADPj3hWJsX-1Je-wC0ax30C1nEUp1E0xfpSc4Y-bDpBP8OXT-2j_3PyTQAgvZA/exec';
 
 (function () {
   const state = { success: null, failure: null, userObject: null };
