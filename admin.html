@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Admin Dashboard - Friendship Educational Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+    
+    /* LOGIN SCREEN */
+    .login-container { max-width: 450px; width: 90%; margin: 20px auto; }
+    .login-card { background: white; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
+    .login-header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 32px; text-align: center; }
+    .login-header h3 { margin: 0; font-weight: 700; letter-spacing: -0.3px; }
+    .login-body { padding: 32px; }
+    .form-group { margin-bottom: 24px; }
+    .form-group label { font-weight: 600; margin-bottom: 8px; display: block; color: #1e293b; }
+    .form-control { border-radius: 16px; padding: 12px 16px; border: 1.5px solid #e2e8f0; font-size: 14px; transition: all 0.2s; }
+    .form-control:focus { border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.15); outline: none; }
+    .btn-login { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 14px; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 8px 20px rgba(102,126,234,0.3); }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(102,126,234,0.4); }
+    .error-message { background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 16px; margin-bottom: 20px; font-size: 13px; display: none; }
+    .password-wrapper { position: relative; }
+    .show-password { cursor: pointer; position: absolute; right: 16px; top: 42px; color: #94a3b8; }
+    
+    /* DASHBOARD */
+    .dashboard-container { display: none; background: #f1f5f9; min-height: 100vh; padding: 16px 12px; }
+    .container-custom { max-width: 1400px; margin: 0 auto; }
+    
+    /* HEADER */
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px 22px; border-radius: 28px; margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    .header h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 4px; }
+    .header p { font-size: 0.75rem; opacity: 0.9; margin: 0; }
+    .logout-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 40px; font-size: 13px; font-weight: 500; transition: 0.2s; }
+    .logout-btn:hover { background: rgba(255,255,255,0.3); transform: scale(0.96); }
+    
+    /* STATS CARDS */
+    .stat-card { background: white; border-radius: 24px; padding: 18px 14px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border-left: 5px solid #667eea; transition: 0.2s; }
+    .stat-value { font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1.2; }
+    .stat-label { font-size: 12px; color: #64748b; margin-top: 6px; font-weight: 500; }
+    
+    /* TABS */
+    .tab { display: flex; gap: 8px; background: white; border-radius: 60px; padding: 6px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .tab button { background: transparent; border: none; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 40px; color: #475569; white-space: nowrap; transition: all 0.2s; }
+    .tab button i { margin-right: 6px; }
+    .tab button.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; box-shadow: 0 4px 10px rgba(102,126,234,0.3); }
+    
+    /* TAB CONTENT */
+    .tabcontent { display: none; background: white; border-radius: 28px; padding: 18px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+    
+    /* TABLES */
+    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 20px; }
+    .table { min-width: 680px; margin-bottom: 0; font-size: 12px; }
+    .table thead th { background: #f8fafc; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 14px 10px; border-bottom: 2px solid #e2e8f0; }
+    .table tbody td { padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+    .table tbody tr:hover { background: #fefce8; cursor: pointer; }
+    
+    /* BADGES & PROGRESS */
+    .status-badge { padding: 4px 10px; border-radius: 30px; font-size: 10px; font-weight: 700; display: inline-block; white-space: nowrap; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-partial { background: #fed7aa; color: #9b2c1d; }
+    .status-pending { background: #ffe4e2; color: #b91c1c; }
+    .progress-custom { height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-top: 6px; width: 100px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #34d399); border-radius: 10px; }
+    
+    /* BUTTONS */
+    .btn-action { padding: 8px 14px; border: none; border-radius: 40px; font-size: 12px; font-weight: 600; transition: 0.2s; margin: 3px; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary-custom { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    .btn-success-custom { background: #10b981; color: white; }
+    .btn-info-custom { background: #0ea5e9; color: white; }
+    .btn-dark-custom { background: #1e293b; color: white; }
+    .btn-warning-custom { background: #f59e0b; color: white; }
+    .action-icon { background: #667eea; color: white; border: none; padding: 5px 12px; border-radius: 30px; font-size: 11px; font-weight: 500; margin: 2px; }
+    
+    /* TOPPERS CARDS */
+    .topper-card { background: #fffbeb; border-radius: 20px; padding: 14px; margin-bottom: 14px; border-left: 5px solid #fbbf24; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+    .rank-badge { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+    .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1e293b; }
+    .rank-2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: #0f172a; }
+    .rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: white; }
+    .topper-class-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .topper-class-header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 16px; font-weight: 700; }
+    .info-box { background: #e0f2fe; border-left: 4px solid #0284c7; padding: 14px; border-radius: 18px; font-size: 12px; margin: 12px 0; }
+    
+    /* LOADING + TOAST */
+    .loading-spinner { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(4px); }
+    .toast-message { position: fixed; bottom: 20px; left: 20px; right: 20px; z-index: 10000; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    
+    /* MARKSHEET GENERATION STYLES */
+    .student-selection-list { height: auto; min-height: 120px; }
+    .form-label { font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+    
+    @media (min-width: 768px) {
+      .dashboard-container { padding: 24px; }
+      .stat-value { font-size: 32px; }
+      .table { min-width: auto; font-size: 13px; }
+      .btn-action { width: auto; margin-bottom: 0; }
+      .toast-message { left: auto; right: 24px; min-width: 320px; }
+      .header h3 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-container" id="loginScreen">
+  <div class="login-card">
+    <div class="login-header">
+      <i class="fas fa-shield-alt fa-2x mb-2"></i>
+      <h3>Admin Portal</h3>
+      <p>Friendship Educational Academy</p>
+    </div>
+    <div class="login-body">
+      <div class="error-message" id="loginError"><i class="fas fa-exclamation-circle"></i> Invalid password</div>
+      <div class="form-group">
+        <label><i class="fas fa-lock"></i> Secure Password</label>
+        <div class="password-wrapper">
+          <input type="password" class="form-control" id="adminPassword" placeholder="Enter admin key" onkeypress="handleKeyPress(event)">
+          <i class="fas fa-eye show-password" onclick="togglePassword()"></i>
+        </div>
+      </div>
+      <button class="btn-login" onclick="loginAdmin()"><i class="fas fa-sign-in-alt"></i> Login to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div class="dashboard-container" id="dashboardScreen">
+  <div class="container-custom">
+    <div class="header">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+          <h3><i class="fas fa-chalkboard-user"></i> Admin Command Center</h3>
+          <p>Track submissions | Generate reports | Toppers & Grace marks | Marksheets</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="logout-btn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+          <button class="logout-btn" onclick="refreshCurrentTab()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'tracker')" id="defaultOpen"><i class="fas fa-tasks"></i> Submission Tracker</button>
+      <button class="tablinks" onclick="openTab(event, 'reports')"><i class="fas fa-print"></i> Class Reports</button>
+      <button class="tablinks" onclick="openTab(event, 'toppers')"><i class="fas fa-trophy"></i> Toppers Board</button>
+      <button class="tablinks" onclick="openTab(event, 'grace')"><i class="fas fa-hand-holding-heart"></i> Grace Marks</button>
+      <button class="tablinks" onclick="openTab(event, 'marksheets')"><i class="fas fa-file-alt"></i> Marksheets</button>
+    </div>
+
+    <!-- TAB 1: SUBMISSION TRACKER -->
+    <div id="tracker" class="tabcontent">
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="totalTeachers">-</div><div class="stat-label"><i class="fas fa-chalkboard-user"></i> Total Teachers</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="totalAssignments">-</div><div class="stat-label"><i class="fas fa-book-open"></i> Total Tasks</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="completedAssignments">-</div><div class="stat-label"><i class="fas fa-check-circle"></i> Completed</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="pendingAssignments">-</div><div class="stat-label"><i class="fas fa-hourglass-half"></i> Pending</div></div></div>
+      </div>
+      <div class="card mb-4 border-0 shadow-sm"><div class="card-header bg-white fw-bold"><i class="fas fa-envelope"></i> Bulk Reminders</div><div class="card-body"><div class="row g-2 align-items-center"><div class="col-12 col-md-6"><select class="form-select" id="reminderType"><option value="all">All pending teachers</option><option value="partial">Partial submissions only</option><option value="none">Zero submissions</option></select></div><div class="col-12 col-md-6"><button class="btn btn-warning w-100 fw-bold" onclick="sendReminders()"><i class="fas fa-paper-plane"></i> Send Reminders</button></div></div></div></div>
+      <div class="card border-0 shadow-sm"><div class="card-header bg-white fw-bold"><i class="fas fa-users"></i> Complete Teacher Submissions (All Teachers)</div><div class="card-body p-0"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Teacher</th><th>Email</th><th>Total</th><th>Done</th><th>Pending</th><th>Completion</th><th>Status</th><th>Action</th></tr></thead><tbody id="teacherTableBody"><tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary"></div> Loading teachers...</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- TAB 2: CLASS REPORTS -->
+    <div id="reports" class="tabcontent">
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-md-6"><button class="btn-action btn-primary-custom w-100" onclick="generateAllClassReports()"><i class="fas fa-layer-group"></i> Generate All Class Reports</button></div>
+        <div class="col-12 col-md-6"><button class="btn-action btn-info-custom w-100" onclick="refreshClassStatus()"><i class="fas fa-arrows-rotate"></i> Refresh Status</button></div>
+      </div>
+      <div class="card border-0 shadow-sm"><div class="card-header bg-white fw-bold"><i class="fas fa-school"></i> Classes Completion Overview</div><div class="card-body p-0"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>S.No</th><th>Class</th><th>Students</th><th>Subjects</th><th>Completed</th><th>Pending</th><th>%</th><th>Status</th><th>Action</th></tr></thead><tbody id="classesStatusBody"><tr><td colspan="9" class="text-center py-4"><div class="spinner-border text-primary"></div></td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- TAB 3: TOPPERS -->
+<div id="toppers" class="tabcontent">
+  <div class="card mb-3 border-0 shadow-sm" style="background:linear-gradient(135deg,#f8fafc,#ffffff)">
+    <div class="card-header bg-white fw-bold">
+      <i class="fas fa-database"></i> Master Rankers Engine
+    </div>
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-12 col-md-8">
+          <p class="mb-1 fw-semibold">🏆 Master Top Rankers Sheet (all classes combined)</p>
+          <small class="text-secondary">Scan all classes and update master leaderboard.</small>
+        </div>
+        <div class="col-12 col-md-4">
+          <button class="btn-action btn-dark-custom w-100" onclick="updateMasterTopRankersSheet()">
+            <i class="fas fa-cloud-upload-alt"></i> Update Master Sheet
+          </button>
+        </div>
+      </div>
+      <div id="masterSheetResult" style="display:none;" class="mt-3"></div>
+    </div>
+  </div>
+
+  <!-- Certificate Generation Button - ALL CLASSES in ONE CLICK -->
+  <div class="row g-2 mb-3">
+    <div class="col-12">
+      <button class="btn-action btn-primary-custom w-100" onclick="generateAllClassesCertificates()" style="background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 12px; font-size: 14px;">
+        <i class="fas fa-award"></i> 🏆 Generate Certificates for ALL CLASSES (One Click) - A4 Landscape Print Ready
+      </button>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <i class="fas fa-lightbulb"></i> 
+    <strong>How it works:</strong> After marks entry, click "Update Master Sheet" → then generate toppers.
+  </div>
+  
+  <div class="card border-0 shadow-sm mt-3">
+    <div class="card-header bg-white fw-bold">
+      <i class="fas fa-filter"></i> Generate Classwise Toppers
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-12 col-md-5">
+          <label class="form-label fw-semibold">Select Class</label>
+          <select class="form-select" id="topperClassSelect">
+            <option value="">-- Choose class --</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label fw-semibold">Top N</label>
+          <select class="form-select" id="topperCount">
+            <option value="1">Top 1</option>
+            <option value="3" selected>Top 3</option>
+            <option value="5">Top 5</option>
+            <option value="10">Top 10</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-4 d-flex gap-2 align-items-end">
+          <button class="btn-action btn-primary-custom flex-grow-1" onclick="generateToppers()">
+            <i class="fas fa-chart-line"></i> Generate
+          </button>
+          <button class="btn-action btn-success-custom" onclick="exportToppersCSV()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="topperMessageContainer"></div>
+  
+  <div class="card mt-3 border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold">
+      <span id="topperTitle">🏅 Toppers List</span>
+    </div>
+    <div class="card-body" id="toppersContainer">
+      <div class="text-center text-muted py-5">
+        <i class="fas fa-trophy fa-3x mb-2 opacity-25"></i><br>
+        Select class & click Generate
+      </div>
+    </div>
+  </div>
+  
+  <div class="card mt-3 border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold">
+      <i class="fas fa-chart-simple"></i> All Classes Summary
+    </div>
+    <div class="card-body">
+      <button class="btn-action btn-info-custom mb-3" onclick="generateAllToppersSummary()">
+        <i class="fas fa-globe"></i> Show All Classes Toppers
+      </button>
+      <div id="allToppersSummary"></div>
+    </div>
+  </div>
+</div>
+
+    <!-- TAB 4: GRACE MARKS -->
+    <div id="grace" class="tabcontent">
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-md-6"><button class="btn-action btn-info-custom w-100" onclick="findGraceMarks()"><i class="fas fa-magic"></i> Find Needy Students</button></div>
+        <div class="col-12 col-md-6"><button class="btn-action btn-success-custom w-100" onclick="exportGraceMarksCSV()"><i class="fas fa-file-csv"></i> Export CSV</button></div>
+      </div>
+      <div class="card border-0 shadow-sm"><div class="card-header bg-white fw-bold"><i class="fas fa-gift"></i> Grace Marks Candidates (29-31 in single subject)</div><div class="card-body p-0"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Class</th><th>Roll No</th><th>Student Name</th><th>Failed Subject</th><th>Current Mark</th><th>Suggested Mark</th></tr></thead><tbody id="graceMarksBody"><tr><td colspan="6" class="text-center text-muted py-4">Click "Find Students" to scan</td></tr></tbody></table></div></div></div>
+      <div class="alert alert-info mt-3 small"><i class="fas fa-scale-balanced"></i> <strong>Grace Policy:</strong> If a student fails in ONLY ONE subject with 29-31 marks → promoted to 32 (pass).</div>
+    </div>
+
+    <!-- TAB 5: MARKSHEETS GENERATION -->
+    <div id="marksheets" class="tabcontent">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold">
+          <i class="fas fa-print"></i> Generate Marksheets (A4 Ready)
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label fw-semibold">Select Class</label>
+              <select class="form-select" id="marksheetClassSelect" onchange="loadStudentsForMarksheet()">
+                <option value="">-- Choose Class --</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label fw-semibold">Examination Name</label>
+              <input type="text" class="form-control" id="examName" value="Half Yearly Examination" placeholder="e.g., Annual Examination">
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label fw-semibold">Generation Mode</label>
+              <select class="form-select" id="generationMode" onchange="loadStudentsForMarksheet()">
+                <option value="all">All Students (Full Class)</option>
+                <option value="selected">Selected Students Only</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row g-3 mt-2" id="studentSelectionDiv" style="display:none;">
+            <div class="col-12">
+              <label class="form-label fw-semibold">Select Students (Hold Ctrl/Cmd for multiple)</label>
+              <select class="form-select" id="studentSelectList" multiple size="5" style="height: auto; min-height: 120px;">
+                <option value="">Loading students...</option>
+              </select>
+              <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple students</small>
+            </div>
+          </div>
+          
+          <div class="row g-3 mt-3">
+            <div class="col-12 col-md-6">
+              <button class="btn-action btn-primary-custom w-100" onclick="generateMarksheets()">
+                <i class="fas fa-file-pdf"></i> Generate Marksheets
+              </button>
+            </div>
+            <div class="col-12 col-md-6">
+              <button class="btn-action btn-info-custom w-100" onclick="previewMarksheetSettings()">
+                <i class="fas fa-eye"></i> Preview Settings
+              </button>
+            </div>
+          </div>
+          
+          <div class="alert alert-info mt-3 small">
+            <i class="fas fa-info-circle"></i> 
+            <strong>Marksheet Features:</strong>
+            <ul class="mb-0 mt-1">
+              <li>📄 A4 size paper optimized with 1.5cm margins</li>
+              <li>🔤 Large fonts (16px+) for easy reading</li>
+              <li>🖨️ Ready to print - one click print all marksheets</li>
+              <li>📸 Student photo support (if available in spreadsheet)</li>
+              <li>🏆 Shows Rank, Percentage, Division, Result</li>
+              <li>📚 Uses RESULT_SUBJECTS configuration</li>
+              <li>🎨 Grade-based subjects are handled specially</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-spinner" id="loadingSpinner"><div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div><p class="mt-3 text-white">Processing...</p></div>
+<div class="toast-message" id="toastMessage" style="display:none;"><div class="alert alert-success alert-dismissible fade show mb-0 shadow"><span id="toastText"></span><button type="button" class="btn-close" onclick="closeToast()"></button></div></div>
+
+<script src="js/bridge.js"></script>
+<script>
+  let allTeachersData = [];
+  let classesList = [];
+  let isLoading = false;
+
+  // ========== LOGIN ==========
+  function loginAdmin() {
+    let pwd = document.getElementById('adminPassword').value;
+    let errDiv = document.getElementById('loginError');
+    if (!pwd) { errDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Enter password'; errDiv.style.display = 'block'; return; }
+    showLoading();
+    google.script.run.withSuccessHandler(function(res) {
+      hideLoading();
+      if (res === true) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'block';
+        initializeDashboard();
+      } else { errDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Wrong password'; errDiv.style.display = 'block'; document.getElementById('adminPassword').value = ''; }
+    }).withFailureHandler(function(err) { hideLoading(); errDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> '+err.message; errDiv.style.display = 'block'; }).verifyAdminPassword(pwd);
+  }
+  
+  function logoutAdmin() { if(confirm('Logout from admin panel?')){ document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('dashboardScreen').style.display = 'none'; document.getElementById('adminPassword').value = ''; document.getElementById('loginError').style.display = 'none'; } }
+  function togglePassword() { let inp = document.getElementById('adminPassword'); let icon = document.querySelector('.show-password'); if(inp.type === 'password'){ inp.type='text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } else { inp.type='password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } }
+  function handleKeyPress(e) { if(e.key === 'Enter') loginAdmin(); }
+  function initializeDashboard() { document.getElementById('defaultOpen').click(); }
+  function showLoading() { document.getElementById('loadingSpinner').style.display = 'flex'; }
+  function hideLoading() { document.getElementById('loadingSpinner').style.display = 'none'; }
+  function showToast(msg, isErr=false) { let toast = document.getElementById('toastMessage'); let text = document.getElementById('toastText'); let alertDiv = toast.querySelector('.alert'); text.textContent = msg; alertDiv.className = isErr ? 'alert alert-danger alert-dismissible fade show mb-0 shadow' : 'alert alert-success alert-dismissible fade show mb-0 shadow'; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3500); }
+  function closeToast() { document.getElementById('toastMessage').style.display = 'none'; }
+  function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+  
+  function openTab(evt, tabName) {
+    let tabcontent = document.getElementsByClassName("tabcontent"); for(let i=0;i<tabcontent.length;i++) tabcontent[i].style.display = "none";
+    let tablinks = document.getElementsByClassName("tablinks"); for(let i=0;i<tablinks.length;i++) tablinks[i].className = tablinks[i].className.replace(" active", "");
+    document.getElementById(tabName).style.display = "block"; if(evt) evt.currentTarget.className += " active";
+    if(tabName === 'tracker') loadDashboardData(); 
+    else if(tabName === 'reports') loadClassesStatus(); 
+    else if(tabName === 'toppers') loadClassListForToppers();
+    else if(tabName === 'marksheets') loadClassListForMarksheets();
+  }
+  
+  function refreshCurrentTab() { let active = document.querySelector('.tablinks.active'); if(active) { let txt = active.innerText; if(txt.includes('Tracker')) loadDashboardData(); else if(txt.includes('Reports')) loadClassesStatus(); else if(txt.includes('Toppers')) loadClassListForToppers(); else if(txt.includes('Marksheets')) loadClassListForMarksheets(); } }
+
+  // ========== TAB 1: SUBMISSION TRACKER ==========
+  function loadDashboardData() {
+    if(isLoading) return;
+    isLoading = true;
+    document.getElementById('teacherTableBody').innerHTML = '<tr><td colspan="8" class="text-center"><div class="spinner-border text-primary"></div> Fetching all teachers...</td></tr>';
+    google.script.run.withSuccessHandler(function(resp) {
+      isLoading = false;
+      if(resp.success) {
+        allTeachersData = resp.teachers;
+        document.getElementById('totalTeachers').innerText = resp.summary.totalTeachers;
+        document.getElementById('totalAssignments').innerText = resp.summary.totalAssignments;
+        document.getElementById('completedAssignments').innerText = resp.summary.completedAssignments;
+        document.getElementById('pendingAssignments').innerText = resp.summary.pendingAssignments;
+        renderAllTeachersTable();
+      } else showToast(resp.message, true);
+      hideLoading();
+    }).withFailureHandler(function(err) { isLoading=false; hideLoading(); showToast('Error: '+err.message, true); }).adminGetSubmissionStatusFromSheets();
+  }
+
+  function renderAllTeachersTable() {
+    let tbody = document.getElementById('teacherTableBody');
+    if(!allTeachersData || allTeachersData.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No teachers found</td></tr>'; return; }
+    let html = '';
+    for(let i=0; i<allTeachersData.length; i++) {
+      let t = allTeachersData[i];
+      let statusClass = t.completionPercentage === 100 ? 'status-completed' : (t.completionPercentage > 0 ? 'status-partial' : 'status-pending');
+      let statusText = t.completionPercentage === 100 ? 'Completed' : (t.completionPercentage > 0 ? 'Partial' : 'Pending');
+      html += `<tr>
+        <td><strong>${escapeHtml(t.name)}</strong></td>
+        <td>${escapeHtml(t.email)}</td>
+        <td>${t.totalAssignments}</td>
+        <td class="text-success fw-bold">${t.completedCount}</td>
+        <td class="text-danger">${t.pendingCount}</td>
+        <td>${t.completionPercentage}%<div class="progress-custom"><div class="progress-fill" style="width: ${t.completionPercentage}%"></div></div></td>
+        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        <td><button class="action-icon" onclick="sendSingleReminder('${t.email}')"><i class="fas fa-envelope"></i> Remind</button></td>
+      </tr>`;
+    }
+    tbody.innerHTML = html;
+  }
+
+  function sendSingleReminder(email) { if(confirm('Send reminder?')){ showLoading(); google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success) showToast(`Reminder sent to ${res.teacherName}`); else showToast(res.message,true); }).withFailureHandler(function(err){hideLoading();showToast(err.message,true);}).adminSendSingleReminder(email); } }
+  function sendReminders() { let type = document.getElementById('reminderType').value; let msg = type==='all'?'Send to all pending?':(type==='partial'?'Send to partial?':'Send to zero submissions?'); if(confirm(msg)){ showLoading(); google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success){ showToast(`Reminders sent to ${res.count} teachers`); loadDashboardData(); } else showToast(res.message,true); }).adminSendBulkReminders(type); } }
+
+  // ========== TAB 2: REPORTS ==========
+  function loadClassesStatus() { let tbody = document.getElementById('classesStatusBody'); tbody.innerHTML = '<tr><td colspan="9" class="text-center"><div class="spinner-border text-primary"></div></td></tr>'; google.script.run.withSuccessHandler(function(res){ if(res.success) displayClasses(res.classes); else tbody.innerHTML=`<tr><td colspan="9" class="text-danger">${res.message}</td></tr>`; }).adminGetAllClassesStatus(); }
+  function displayClasses(classes) { let tbody = document.getElementById('classesStatusBody'); tbody.innerHTML=''; if(!classes.length){ tbody.innerHTML='<tr><td colspan="9">No classes</td></tr>'; return; } classes.forEach((c,i)=>{ let statusClass = c.isComplete?'status-completed':(c.completionPercentage>0?'status-partial':'status-pending'); let statusTxt = c.isComplete?'✅ Complete':(c.completionPercentage>0?'⚠️ Partial':'❌ Pending'); tbody.innerHTML+=`<tr><td class="text-center">${i+1}</td><td><strong>${escapeHtml(c.className)}</strong></td><td class="text-center">${c.totalStudents}</td><td class="text-center">${c.totalSubjects}</td><td class="text-success fw-bold text-center">${c.completedSubjects}</td><td class="text-danger text-center">${c.pendingSubjects}</td><td>${c.completionPercentage}%<div class="progress-custom"><div class="progress-fill" style="width:${c.completionPercentage}%"></div></div></td><td class="text-center"><span class="status-badge ${statusClass}">${statusTxt}</span></td><td class="text-center"><button class="action-icon" onclick="generateClassReport('${c.className}')"><i class="fas fa-print"></i> Report</button></td>`; }); }
+  function generateClassReport(className) { showLoading(); google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success){ let win=window.open('','_blank'); win.document.write(res.html); win.document.close(); showToast(`Report: ${className}`); } else showToast(res.message,true); }).adminGenerateFullClassReport(className); }
+  function generateAllClassReports() { if(confirm('Generate reports for all classes?')){ showLoading(); google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success){ let win=window.open('','_blank'); win.document.write(res.html); win.document.close(); showToast('All reports ready'); } else showToast(res.message,true); }).adminGenerateConsolidatedReport(); } }
+  function refreshClassStatus() { loadClassesStatus(); showToast('Refreshed'); }
+
+  // ========== MASTER TOPPERS SHEET ==========
+  function updateMasterTopRankersSheet() { if(confirm('Update master sheet? Scans all classes.')){ showLoading(); let div=document.getElementById('masterSheetResult'); div.style.display='block'; div.innerHTML='<div class="alert alert-info">⏳ Updating master rankers...</div>'; google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success){ div.innerHTML=`<div class="alert alert-success">✅ Master sheet updated! ${res.count || 0} rankers added.</div>`; showToast('Master sheet updated'); setTimeout(()=>div.style.display='none',4000); } else { div.innerHTML=`<div class="alert alert-danger">❌ Error: ${res.message}</div>`; showToast(res.message,true); } }).generateTopRankersSheet(); } }
+
+  // ========== TAB 3: TOPPERS ==========
+  function loadClassListForToppers() { let sel = document.getElementById('topperClassSelect'); sel.innerHTML='<option value="">Loading classes...</option>'; google.script.run.withSuccessHandler(function(res){ let classes=Array.isArray(res)?res:(res.classes||[]); if(!classes.length) classes=["Pre-Nursery","Nursery","KG","I(One)","II(Two)","III(Three)","IV(Four)","V(Five)","VI(Six)","VII(Seven)","VIII(Eight)","IX(Nine)","X(Ten)"]; sel.innerHTML='<option value="">-- Select Class --</option>'; classes.forEach(c=>sel.innerHTML+=`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`); }).withFailureHandler(function(){ let def=["Pre-Nursery","Nursery","KG","I(One)","II(Two)","III(Three)","IV(Four)","V(Five)","VI(Six)","VII(Seven)","VIII(Eight)","IX(Nine)","X(Ten)"]; sel.innerHTML='<option value="">-- Select Class --</option>'; def.forEach(c=>sel.innerHTML+=`<option value="${c}">${c}</option>`); }).getClassList(); }
+  
+  function generateToppers() { let cls = document.getElementById('topperClassSelect').value; let cnt = parseInt(document.getElementById('topperCount').value); if(!cls){ showToast('Pick a class',true); return; } showLoading(); document.getElementById('topperTitle').innerHTML='<i class="fas fa-spinner fa-pulse"></i> Loading...'; google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success && res.toppers?.length){ document.getElementById('topperTitle').innerHTML=`<i class="fas fa-trophy"></i> ${cls} - Top ${res.toppers.length}`; let html=''; for(let t of res.toppers){ let rankClass = t.rank===1?'rank-1':(t.rank===2?'rank-2':'rank-3'); let perc = (typeof t.percentage === 'number') ? Math.round(t.percentage*100)/100 : t.percentage; html+=`<div class="topper-card"><div class="d-flex flex-wrap justify-content-between"><div class="d-flex gap-2"><div class="rank-badge ${rankClass}">${t.rank}</div><div><h6 class="mb-0">${escapeHtml(t.name)}</h6><small>Roll: ${t.rollNo}</small></div></div><div><strong>${perc}%</strong><br><small>${t.division||''}</small></div></div><div class="small text-secondary mt-2"><i class="fas fa-user"></i> Father: ${escapeHtml(t.fatherName||'—')} &nbsp;| Mother: ${escapeHtml(t.motherName||'—')}</div></div>`; } document.getElementById('toppersContainer').innerHTML=html; } else { document.getElementById('toppersContainer').innerHTML=`<div class="alert alert-warning">No toppers for ${cls}. Update master sheet first.</div>`; } }).adminGetClassToppers(cls,cnt); }
+  
+  function generateAllToppersSummary() { showLoading(); let cnt = parseInt(document.getElementById('topperCount').value); google.script.run.withSuccessHandler(function(res){ hideLoading(); if(res.success && res.toppers){ let html='<div class="row g-3">'; for(let cn in res.toppers){ let arr = res.toppers[cn]; if(arr?.length){ html+=`<div class="col-md-6"><div class="topper-class-card"><div class="topper-class-header">🏆 ${escapeHtml(cn)}</div><div class="p-2"><table class="table table-sm"><thead><tr><th>Rank</th><th>Name</th><th>%</th></tr></thead><tbody>`; arr.forEach(t=>{ let p = typeof t.percentage==='number'?Math.round(t.percentage*100)/100:t.percentage; html+=`<tr><td>#${t.rank}</td><td>${escapeHtml(t.name)}</td><td><strong>${p}%</strong></td>`; }); html+=`</tbody></table></div></div></div>`; } } html+='</div>'; document.getElementById('allToppersSummary').innerHTML=html||'<div class="alert alert-info">No data</div>'; } else document.getElementById('allToppersSummary').innerHTML='<div class="alert alert-warning">No toppers found</div>'; }).adminGetAllClassToppers(cnt); }
+  
+  function exportToppersCSV() { let cls = document.getElementById('topperClassSelect').value; if(!cls){ showToast('Select class',true); return; } showLoading(); google.script.run.withSuccessHandler(function(csv){ hideLoading(); if(csv && !csv.includes('Error')){ let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); let url=URL.createObjectURL(blob); a.href=url; a.download=`${cls}_toppers.csv`; a.click(); URL.revokeObjectURL(url); showToast('Exported'); } else showToast(csv||'Error',true); }).exportToppersToCSV(); }
+
+  /***************************************************
+ * ========== CORRECTED GRACE MARKS FUNCTION ==========
+ * Shows students who fail in EXACTLY ONE subject
+ * Either numeric (0-31) OR grade ('F')
+ ***************************************************/
+
+// ========== TAB 4: GRACE MARKS ==========
+// ========== TAB 4: GRACE MARKS ==========
+function findGraceMarks() { 
+  showLoading(); 
+  
+  google.script.run
+    .withSuccessHandler(function(res){ 
+      hideLoading(); 
+      
+      // DEBUG: Log the entire response
+      console.log("Full response from server:", JSON.stringify(res));
+      console.log("studentsNeedingGrace array:", res.studentsNeedingGrace);
+      console.log("Total students checked:", res.totalStudentsChecked);
+      
+      let tbody = document.getElementById('graceMarksBody'); 
+      
+      if (res.studentsNeedingGrace && res.studentsNeedingGrace.length > 0) { 
+        let html = ''; 
+        for (let i = 0; i < res.studentsNeedingGrace.length; i++) { 
+          let s = res.studentsNeedingGrace[i]; 
+          let markClass = s.subjectType === 'Grade' ? 'text-warning' : 'text-danger';
+          html += `<tr>
+            <td><strong>${escapeHtml(s.class)}</strong></td>
+            <td>${escapeHtml(s.rollNo)}</td>
+            <td>${escapeHtml(s.studentName)}</td>
+            <td>${escapeHtml(s.failedSubject)}</td>
+            <td class="${markClass} fw-bold">${s.currentMark}</td>
+            <td class="text-success fw-bold">${s.suggestedNewMark}</td>
+          </tr>`; 
+        } 
+        tbody.innerHTML = html; 
+        showToast(`${res.studentsNeedingGrace.length} student(s) eligible for grace marks`);
+      } else { 
+        // Show more detailed message
+        let message = 'No students need grace marks';
+        if (res.totalStudentsChecked) {
+          message = `No grace candidates found. Checked ${res.totalStudentsChecked} students.`;
+        }
+        if (res.error) {
+          message = 'Error: ' + res.error;
+        }
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-warning py-4">⚠️ ${message}</td></tr>`; 
+        showToast(message, true); 
+      } 
+    })
+    .withFailureHandler(function(err) {
+      hideLoading(); 
+      console.error("Error details:", err);
+      showToast('Error: ' + err.message, true);
+    })
+    .findStudentsNeedingGraceMarks(); 
+}
+
+function exportGraceMarksCSV() { 
+  showLoading(); 
+  google.script.run
+    .withSuccessHandler(function(csv){ 
+      hideLoading(); 
+      if(csv && !csv.includes('Error') && !csv.includes('No students')){ 
+        let blob = new Blob([csv], {type:'text/csv'}); 
+        let a = document.createElement('a'); 
+        let url = URL.createObjectURL(blob); 
+        a.href = url; 
+        a.download = `grace_marks_list_${new Date().toISOString().slice(0,19)}.csv`; 
+        a.click(); 
+        URL.revokeObjectURL(url); 
+        showToast('CSV exported successfully'); 
+      } else { 
+        showToast(csv || 'No data to export', true); 
+      } 
+    })
+    .withFailureHandler(function(err) {
+      hideLoading(); 
+      showToast('Error: ' + err.message, true);
+    })
+    .exportGraceMarksList(); 
+}
+
+  // ========== TAB 5: MARKSHEETS ==========
+  function loadClassListForMarksheets() {
+    let sel = document.getElementById('marksheetClassSelect');
+    sel.innerHTML = '<option value="">Loading classes...</option>';
+    google.script.run.withSuccessHandler(function(res) {
+      let classes = Array.isArray(res) ? res : (res.classes || []);
+      if (!classes.length) {
+        classes = ["Pre-Nursery","Nursery","KG","I(One)","II(Two)","III(Three)","IV(Four)","V(Five)","VI(Six)","VII(Seven)","VIII(Eight)","IX(Nine)","X(Ten)"];
+      }
+      sel.innerHTML = '<option value="">-- Select Class --</option>';
+      for (let c of classes) {
+        sel.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`;
+      }
+    }).withFailureHandler(function() {
+      let def = ["Pre-Nursery","Nursery","KG","I(One)","II(Two)","III(Three)","IV(Four)","V(Five)","VI(Six)","VII(Seven)","VIII(Eight)","IX(Nine)","X(Ten)"];
+      sel.innerHTML = '<option value="">-- Select Class --</option>';
+      for (let c of def) {
+        sel.innerHTML += `<option value="${c}">${c}</option>`;
+      }
+    }).getClassList();
+  }
+
+  function loadStudentsForMarksheet() {
+    let className = document.getElementById('marksheetClassSelect').value;
+    let mode = document.getElementById('generationMode').value;
+    let studentDiv = document.getElementById('studentSelectionDiv');
+    let studentSelect = document.getElementById('studentSelectList');
+    
+    if (!className) {
+      studentDiv.style.display = 'none';
+      return;
+    }
+    
+    if (mode === 'selected') {
+      studentDiv.style.display = 'block';
+      studentSelect.innerHTML = '<option value="">Loading students...</option>';
+      
+      google.script.run.withSuccessHandler(function(res) {
+        if (res.success && res.students) {
+          studentSelect.innerHTML = '';
+          for (let s of res.students) {
+            studentSelect.innerHTML += `<option value="${escapeHtml(s.roll)}">${escapeHtml(s.roll)} - ${escapeHtml(s.name)}</option>`;
+          }
+        } else {
+          studentSelect.innerHTML = '<option value="">No students found</option>';
+        }
+      }).withFailureHandler(function() {
+        studentSelect.innerHTML = '<option value="">Error loading students</option>';
+      }).getStudentsForClass(className);
+    } else {
+      studentDiv.style.display = 'none';
+    }
+  }
+
+  function generateMarksheets() {
+  let className = document.getElementById('marksheetClassSelect').value;
+  let examName = document.getElementById('examName').value;
+  let mode = document.getElementById('generationMode').value;
+  
+  console.log("Selected Class:", className);
+  console.log("Exam Name:", examName);
+  console.log("Mode:", mode);
+  
+  if (!className) {
+    showToast('Please select a class', true);
+    return;
+  }
+  
+  if (!examName || examName.trim() === "") {
+    examName = "Half Yearly Examination";
+    document.getElementById('examName').value = examName;
+  }
+  
+  showLoading();
+  
+  if (mode === 'selected') {
+    let studentSelect = document.getElementById('studentSelectList');
+    let selectedRolls = [];
+    for (let i = 0; i < studentSelect.options.length; i++) {
+      if (studentSelect.options[i].selected && studentSelect.options[i].value) {
+        selectedRolls.push(studentSelect.options[i].value);
+      }
+    }
+    
+    if (selectedRolls.length === 0) {
+      hideLoading();
+      showToast('Please select at least one student', true);
+      return;
+    }
+    
+    google.script.run.withSuccessHandler(function(res) {
+      hideLoading();
+      console.log("Response:", res);
+      if (res.success) {
+        let win = window.open('', '_blank');
+        win.document.write(res.html);
+        win.document.close();
+        showToast(`Generated ${res.studentCount} marksheet(s) for ${className} - ${examName}`);
+      } else {
+        showToast(res.message, true);
+      }
+    }).withFailureHandler(function(err) {
+      hideLoading();
+      console.error("Error:", err);
+      showToast('Error: ' + err.message, true);
+    }).generateBatchMarksheets(className, examName, selectedRolls);
+    
+  } else {
+    google.script.run.withSuccessHandler(function(res) {
+      hideLoading();
+      console.log("Response:", res);
+      if (res.success) {
+        let win = window.open('', '_blank');
+        win.document.write(res.html);
+        win.document.close();
+        showToast(`Generated ${res.studentCount} marksheets for ${className} - ${examName}`);
+      } else {
+        showToast(res.message, true);
+      }
+    }).withFailureHandler(function(err) {
+      hideLoading();
+      console.error("Error:", err);
+      showToast('Error: ' + err.message, true);
+    }).generateMarksheet(className, examName);
+  }
+}
+
+  function previewMarksheetSettings() {
+    let className = document.getElementById('marksheetClassSelect').value;
+    let examName = document.getElementById('examName').value;
+    
+    let msg = `📄 MARKSHEET SETTINGS PREVIEW\n\n` +
+      `Class: ${className || 'Not selected'}\n` +
+      `Examination: ${examName || 'Half Yearly Examination'}\n` +
+      `Paper Size: A4 (210mm x 297mm)\n` +
+      `Margins: 1.5cm all sides\n` +
+      `Font Size: 16px minimum\n` +
+      `Subjects Source: RESULT_SUBJECTS configuration\n` +
+      `Print Ready: Yes\n\n` +
+      `Click "Generate Marksheets" to create.`;
+    
+    alert(msg);
+  }
+  // Add this function to your HTML file's script section
+function generateAllClassesCertificates() {
+  var examName = prompt("Enter Examination Name:", "Half Yearly Examination");
+  
+  if (!examName) {
+    examName = "Half Yearly Examination";
+  }
+  
+  showLoading();
+  
+  google.script.run
+    .withSuccessHandler(function(res) {
+      hideLoading();
+      if (res.success) {
+        var win = window.open('', '_blank');
+        win.document.write(res.html);
+        win.document.close();
+        showToast(`✅ Generated ${res.totalCertificates} certificates for ${res.classesWithToppers.length} classes`);
+      } else {
+        showToast(res.message, true);
+      }
+    })
+    .withFailureHandler(function(err) {
+      hideLoading();
+      showToast('Error: ' + err.message, true);
+    })
+    .generateAllClassesToppersCertificates(examName);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Class Toppers - Friendship Educational Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root{
+      --navy:#081d33;
+      --navy2:#123654;
+      --blue:#2b638f;
+      --gold:#b8954d;
+      --gold2:#d7bd7c;
+      --cream:#fbfaf7;
+      --ink:#162638;
+      --muted:#718092;
+      --line:#dfe5eb;
+      --bg:#f1f4f7;
+      --white:#fff;
+      --green:#237055;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+
+    body{
+      font-family:'Inter',sans-serif;
+      background:
+        linear-gradient(180deg,#edf2f6 0,#f5f7f9 42%,#eef2f5 100%);
+      color:var(--ink);
+      min-height:100vh;
+      padding:0 24px 35px;
+    }
+
+    body::before{display:none}
+
+    .container{
+      max-width:1440px;
+      margin:0 auto;
+      position:relative;
+      z-index:2;
+    }
+
+    /* ===== ELEGANT HEADER ===== */
+    .header{
+      margin:0 -24px 25px;
+      padding:45px 25px 38px;
+      text-align:center;
+      background:
+        radial-gradient(circle at 50% 0,rgba(255,255,255,.08),transparent 40%),
+        linear-gradient(135deg,var(--navy),var(--navy2));
+      border:0;
+      border-bottom:4px solid var(--gold);
+      border-radius:0 0 18px 18px;
+      box-shadow:0 14px 35px rgba(8,29,51,.18);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .header::before{
+      content:"";
+      position:absolute;
+      width:180px;height:180px;
+      left:50%;top:-125px;
+      transform:translateX(-50%);
+      border:1px solid rgba(215,189,124,.18);
+      border-radius:50%;
+      box-shadow:0 0 0 25px rgba(215,189,124,.025),
+                 0 0 0 50px rgba(215,189,124,.018);
+    }
+
+    .header::after{
+      content:"";
+      position:absolute;
+      left:16%;right:16%;bottom:8px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+    }
+
+    .header h1{
+      color:#fff;
+      font-size:2.15rem;
+      font-weight:700;
+      letter-spacing:-.5px;
+      line-height:1.2;
+      margin-bottom:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .header h1 i:first-child{
+      color:var(--gold2);
+      font-size:1.45rem;
+      margin-right:8px;
+    }
+
+    .header h1 i:last-child{display:none}
+
+    .header p{
+      display:block;
+      background:none;
+      padding:0;
+      color:rgba(255,255,255,.68);
+      font-size:.74rem;
+      font-weight:500;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      position:relative;
+      z-index:1;
+    }
+
+    /* ===== CLASS NAV ===== */
+    .class-selector{
+      background:rgba(255,255,255,.96);
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:19px 21px 21px;
+      margin-bottom:25px;
+      box-shadow:0 7px 23px rgba(12,35,55,.06);
+    }
+
+    .class-selector h5{
+      text-align:left;
+      font-size:.7rem;
+      font-weight:700;
+      color:var(--navy);
+      letter-spacing:1.35px;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .class-selector h5 i{
+      color:var(--gold);
+      margin-right:7px;
+    }
+
+    .class-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      justify-content:flex-start;
+    }
+
+    .class-btn{
+      padding:9px 16px;
+      border:1px solid #d5dfe8;
+      border-radius:7px;
+      background:#fff;
+      color:#42566b;
+      font:600 .78rem 'Inter',sans-serif;
+      cursor:pointer;
+      transition:all .18s ease;
+      box-shadow:0 1px 2px rgba(0,0,0,.02);
+    }
+
+    .class-btn i{display:none}
+
+    .class-btn:hover{
+      color:var(--navy);
+      background:#f5f8fb;
+      border-color:#b9c9d8;
+      transform:translateY(-1px);
+    }
+
+    .class-btn.active{
+      color:#fff;
+      background:linear-gradient(135deg,var(--navy),#173e5f);
+      border-color:var(--navy);
+      box-shadow:0 5px 13px rgba(8,29,51,.17);
+    }
+
+    /* ===== LOADING ===== */
+    .loading{
+      text-align:center;
+      padding:55px 30px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      box-shadow:0 7px 23px rgba(12,35,55,.055);
+      color:var(--muted);
+    }
+
+    .spinner{
+      width:38px;height:38px;
+      border:3px solid #e2e8ee;
+      border-top-color:var(--blue);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+      margin:0 auto 14px;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+
+    /* ===== STUDENT GRID ===== */
+    .toppers-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+      gap:23px;
+      margin-top:0;
+      align-items:start;
+    }
+
+    /* ===== TOPPER CARD ===== */
+    .topper-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:15px;
+      overflow:hidden;
+      box-shadow:0 9px 28px rgba(8,29,51,.075);
+      transition:transform .22s ease,box-shadow .22s ease;
+      position:relative;
+    }
+
+    .topper-card::before{
+      content:"";
+      display:block;
+      height:3px;
+      background:linear-gradient(90deg,var(--navy),var(--gold),var(--navy));
+      opacity:.9;
+    }
+
+    .topper-card:hover{
+      transform:translateY(-5px);
+      box-shadow:0 18px 38px rgba(8,29,51,.13);
+    }
+
+    /* ===== RANK BADGE ===== */
+    .medal-badge{
+      position:absolute;
+      top:24px;
+      right:20px;
+      width:78px;height:78px;
+      border-radius:50%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      z-index:20;
+      border:4px solid rgba(255,255,255,.95);
+      box-shadow:0 8px 21px rgba(8,29,51,.2);
+      transition:transform .2s ease;
+    }
+
+    .topper-card:hover .medal-badge{transform:scale(1.04)}
+
+    .medal-badge .rank-icon{
+      font-size:20px;
+      line-height:1;
+      margin-bottom:3px;
+      filter:none;
+    }
+
+    .medal-badge .rank-number{
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.2px;
+      text-shadow:none;
+      margin:0;
+      padding:0;
+      background:transparent;
+      color:inherit;
+    }
+
+    .medal-badge .rank-title{
+      font-size:7px;
+      font-weight:700;
+      letter-spacing:1.15px;
+      background:transparent;
+      padding:0;
+      margin:1px 0 0;
+      color:inherit;
+    }
+
+    .rank-1{
+      background:linear-gradient(145deg,#f8edce,#e8d093);
+      color:#70531e;
+    }
+
+    .rank-2{
+      background:linear-gradient(145deg,#f0f3f6,#d9e0e7);
+      color:#536373;
+    }
+
+    .rank-3{
+      background:linear-gradient(145deg,#f3e3d4,#dfc1a9);
+      color:#765337;
+    }
+
+    /* ===== PHOTO ===== */
+    .photo-container{
+      position:relative;
+      text-align:center;
+      padding:37px 20px 30px;
+      background:
+        radial-gradient(circle at 50% 38%,rgba(255,255,255,.85),transparent 38%),
+        linear-gradient(180deg,#f7f9fb,#edf2f5);
+      border-bottom:1px solid var(--line);
+      border-radius:0;
+    }
+
+    .student-photo{
+      width:174px;height:174px;
+      border-radius:50%;
+      object-fit:cover;
+      border:6px solid #fff;
+      box-shadow:0 8px 23px rgba(8,29,51,.17);
+    }
+
+    .default-photo{
+      width:174px;height:174px;
+      border-radius:50%;
+      background:#e6edf3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto;
+      font-size:64px;
+      color:var(--blue);
+      border:6px solid #fff;
+      box-shadow:0 8px 23px rgba(8,29,51,.13);
+    }
+
+    /* ===== INFO ===== */
+    .info-section{
+      padding:24px 23px 26px;
+      background:#fff;
+    }
+
+    .student-name{
+      font-size:1.45rem;
+      line-height:1.3;
+      font-weight:700;
+      color:var(--navy);
+      text-align:center;
+      margin-bottom:6px;
+    }
+
+    .roll-no{
+      display:inline-block;
+      padding:5px 12px;
+      margin:0 auto 11px;
+      border-radius:5px;
+      background:#f5f7f9;
+      border:1px solid #e1e7ec;
+      color:#68788a;
+      font-size:.72rem;
+      font-weight:500;
+    }
+
+    .roll-no i{color:var(--gold)}
+
+    .percentage{
+      font-size:2.25rem;
+      line-height:1.05;
+      font-weight:800;
+      color:var(--blue);
+      text-align:center;
+      margin:10px 0 17px;
+      letter-spacing:-1px;
+    }
+
+    /* subtle divider around key result */
+    .percentage::after{
+      content:"";
+      display:block;
+      width:42px;
+      height:2px;
+      background:var(--gold);
+      margin:11px auto 0;
+      opacity:.65;
+    }
+
+    /* ===== GRADE ===== */
+    .grade-section{
+      background:#f8fafb;
+      border:1px solid var(--line);
+      border-radius:9px;
+      padding:13px 14px;
+      margin:16px 0;
+    }
+
+    .grade-title{
+      font-size:.64rem;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.25px;
+      color:#748394;
+      text-align:left;
+      margin-bottom:10px;
+    }
+
+    .grade-title i{
+      color:var(--gold);
+      margin-right:5px;
+    }
+
+    .grade-letters-container{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      justify-content:flex-start;
+    }
+
+    .grade-letter-badge{
+      min-width:38px;
+      padding:6px 10px;
+      border-radius:5px;
+      color:#fff;
+      background:#667789;
+      text-align:center;
+      font-size:.86rem;
+      font-weight:700;
+      box-shadow:none;
+    }
+
+    .grade-A{background:#267153}
+    .grade-B{background:#356e9f}
+    .grade-C{background:#9c6c30}
+    .grade-D{background:#8b6345}
+    .grade-E{background:#805e45}
+    .grade-F{background:#a84d4b}
+
+    /* ===== DETAIL BOXES ===== */
+    .details-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin:16px 0;
+    }
+
+    .detail-item{
+      background:#fafbfc;
+      padding:11px 9px;
+      border-radius:7px;
+      text-align:center;
+      border:1px solid #e3e8ed;
+      box-shadow:none;
+    }
+
+    .detail-label{
+      font-size:.61rem;
+      font-weight:600;
+      color:#7c8997;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+    }
+
+    .detail-value{
+      font-size:.91rem;
+      font-weight:700;
+      color:var(--navy);
+      margin-top:5px;
+    }
+
+    .info-section > .detail-item[style]{
+      margin-top:11px!important;
+      background:var(--cream)!important;
+      border-color:#e8dfcf;
+    }
+
+    .info-section > .detail-item[style] .detail-label i{
+      color:var(--gold);
+    }
+
+    /* ===== NO DATA ===== */
+    .no-data{
+      text-align:center;
+      padding:58px 20px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:12px;
+      box-shadow:0 7px 23px rgba(12,35,55,.055);
+    }
+
+    .no-data i{
+      font-size:48px;
+      color:#aab6c1;
+      margin-bottom:15px;
+    }
+
+    .no-data h3{
+      color:var(--navy);
+      font-size:1.1rem;
+      margin-bottom:7px;
+    }
+
+    .no-data p{
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer{
+      text-align:center;
+      margin-top:31px;
+      padding:17px 10px 4px;
+      color:#7b8998;
+      font-size:.75rem;
+      font-weight:400;
+      text-shadow:none;
+      background:transparent;
+      border-top:1px solid #dce3e9;
+      border-radius:0;
+    }
+
+    .footer i{color:var(--gold)!important}
+
+    @media(max-width:760px){
+      body{padding:0 12px 26px}
+      .header{
+        margin:0 -12px 19px;
+        padding:32px 18px 29px;
+      }
+      .header h1{font-size:1.6rem}
+      .header p{font-size:.65rem;letter-spacing:1.35px}
+      .class-selector{padding:16px}
+      .toppers-grid{grid-template-columns:1fr;gap:18px}
+    }
+
+    @media(max-width:480px){
+      .medal-badge{width:66px;height:66px;top:15px;right:14px}
+      .medal-badge .rank-icon{font-size:18px}
+      .medal-badge .rank-number{font-size:14px}
+      .student-photo,.default-photo{width:140px;height:140px}
+      .default-photo{font-size:52px}
+      .percentage{font-size:1.9rem}
+      .details-grid{gap:7px}
+      .detail-item{padding:10px 6px}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1><i class="fas fa-crown"></i> Class Toppers <i class="fas fa-star-of-life"></i></h1>
+    <p>Academic Achievement &nbsp;•&nbsp; Rank Holders</p>
+  </div>
+
+  <div class="class-selector">
+    <h5><i class="fas fa-chalkboard-user"></i> Select Class</h5>
+    <div class="class-buttons" id="classButtons">
+      <div class="loading" style="padding: 16px;">
+        <div class="spinner" style="width: 32px; height: 32px;"></div>
+        <p style="margin-top: 8px;">Loading classes...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="contentArea">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading academic results…</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p><i class="fas fa-school"></i> Friendship Educational Academy</p>
+  </div>
+</div>
+
+<script src="js/bridge.js"></script>
+<script>
+    // ==================== GRADE SUBJECTS CONFIGURATION ====================
+    const GRADE_SUBJECTS_MAP = {
+      "Pre-Nursery": ["MANIPURI(GRADE)", "G.K/CONVERSATION(GRADE)", "SCIENCE(GRADE)", "DRAWING(GRADE)", "HANDWRITING(GRADE)", "IDENTIFICATION(GRADE)", "RHYMES(GRADE)"],
+      "Nursery": ["HINDI(GRADE)", "DRAWING(GRADE)", "RHYMES(GRADE)", "HANDWRITING(GRADE)"],
+      "KG": ["HANDWRITING(GRADE)", "DRAWING(GRADE)", "RHYMES(GRADE)"],
+      "I(One)": ["HANDWRITING", "DRAWING"],
+      "II(Two)": ["HANDWRITING", "DRAWING"]
+    };
+    
+    let allClassData = {};
+    let currentClass = null;
+
+    (function init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadAllClassData);
+      } else {
+        loadAllClassData();
+      }
+    })();
+
+    function loadAllClassData() {
+      console.log("loadAllClassData called - fetching all classes from sheet");
+      try {
+        if (typeof google !== 'undefined' && google && google.script && google.script.run) {
+          console.log("Running in Google Apps Script mode");
+          google.script.run
+            .withSuccessHandler(onDataLoaded)
+            .withFailureHandler(onError)
+            .getClasswiseToppers();
+          return;
+        }
+      } catch(e) {
+        console.log("Google Apps Script check failed:", e);
+      }
+      // Fallback if not in GAS - show appropriate message
+      showNoData("Please run this page inside the Google Apps Script environment.");
+      document.getElementById('classButtons').innerHTML = '<div style="padding:12px; background:#ffe4c4; border-radius:50px;">Connect to Google Sheet</div>';
+    }
+
+    function onDataLoaded(response) {
+      console.log("onDataLoaded called", response);
+      let rawData = null;
+      if (response && response.success && response.data) {
+        rawData = response.data;
+      } else if (response && response.data) {
+        rawData = response.data;
+      } else {
+        showNoData("Unable to load toppers data. Please refresh or check sheet connection.");
+        return;
+      }
+      
+      // Process ALL classes dynamically from the raw data
+      allClassData = {};
+      for (let className in rawData) {
+        if (rawData.hasOwnProperty(className) && Array.isArray(rawData[className]) && rawData[className].length > 0) {
+          // Filter only Rank 1, 2, 3 (toppers only)
+          let processed = rawData[className]
+            .filter(s => s.Rank === 1 || s.Rank === 2 || s.Rank === 3)
+            .map(s => {
+              // Extract grade letters for this class if it exists in GRADE_SUBJECTS_MAP
+              let gradeLetters = [];
+              let gradeSubjectsList = GRADE_SUBJECTS_MAP[className] || [];
+              for (let subj of gradeSubjectsList) {
+                let gradeValue = s[subj];
+                if (gradeValue === undefined || gradeValue === null) {
+                  gradeLetters.push("—");
+                } else {
+                  let letter = String(gradeValue).trim().charAt(0).toUpperCase();
+                  if (/^[A-F]$/.test(letter)) {
+                    gradeLetters.push(letter);
+                  } else {
+                    gradeLetters.push("—");
+                  }
+                }
+              }
+              
+              return {
+                Rank: s.Rank,
+                "Name of student": s["Name of student"] || "Star Student",
+                "Roll No": s["Roll No"] || "N/A",
+                "Percentage": typeof s.Percentage === 'number' ? s.Percentage.toFixed(2) : (s.Percentage || "0"),
+                "Total marks scored": s["Total marks scored"] || "—",
+                "Division": s.Division || "—",
+                "Attendance": s.Attendance || "—",
+                "Name of Examination": s["Name of Examination"] || "—",
+                "Father's Name": s["Father's Name"] || "",
+                "Mother's Name": s["Mother's Name"] || "",
+                "Photo URL": s["Photo URL"] || "",
+                "gradeLetters": gradeLetters
+              };
+            })
+            .sort((a, b) => a.Rank - b.Rank);
+          
+          if (processed.length > 0) {
+            allClassData[className] = processed;
+          }
+        }
+      }
+      
+      // If no classes after processing, show message
+      if (Object.keys(allClassData).length === 0) {
+        showNoData("No Rank 1–3 records found in any class. Please check the student records.");
+        document.getElementById('classButtons').innerHTML = '<div style="padding:12px; background:#ffe4c4; border-radius:50px;">No classes available</div>';
+        return;
+      }
+      
+      renderClassButtons();
+      const classes = Object.keys(allClassData).sort((a, b) => a.localeCompare(b));
+      if (classes.length > 0) {
+        selectClass(classes[0]);
+      }
+    }
+
+    function renderClassButtons() {
+      const container = document.getElementById('classButtons');
+      if (!container) return;
+      const classes = Object.keys(allClassData).sort((a, b) => a.localeCompare(b));
+      if (classes.length === 0) {
+        container.innerHTML = '<div style="padding:12px; background:#ffe4c4; border-radius:50px;">No topper data available</div>';
+        return;
+      }
+      container.innerHTML = '';
+      classes.forEach(className => {
+        const btn = document.createElement('button');
+        btn.className = 'class-btn';
+        btn.innerHTML = `<i class="fas fa-graduation-cap" style="margin-right:6px;"></i> ${className}`;
+        btn.onclick = function() { selectClass(className); };
+        container.appendChild(btn);
+      });
+    }
+
+    function selectClass(className) {
+      currentClass = className;
+      const buttons = document.querySelectorAll('.class-btn');
+      buttons.forEach(btn => {
+        if (btn.textContent.includes(className)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      renderToppers(className);
+    }
+
+    function getRankDetails(rank) {
+      if (rank === 1) return { icon: "fa-solid fa-crown" };
+      if (rank === 2) return { icon: "fa-solid fa-medal" };
+      if (rank === 3) return { icon: "fa-solid fa-award" };
+      return { icon: "fa-solid fa-star" };
+    }
+    
+    function getGradeClass(letter) {
+      if (letter === 'A') return 'grade-A';
+      if (letter === 'B') return 'grade-B';
+      if (letter === 'C') return 'grade-C';
+      if (letter === 'D') return 'grade-D';
+      if (letter === 'E') return 'grade-E';
+      if (letter === 'F') return 'grade-F';
+      return '';
+    }
+    
+    function renderGradeSection(gradeLetters) {
+      if (!gradeLetters || gradeLetters.length === 0) return '';
+      let badgesHtml = '';
+      for (let letter of gradeLetters) {
+        let displayLetter = letter === '—' ? '—' : letter;
+        let extraClass = (displayLetter !== '—') ? getGradeClass(displayLetter) : '';
+        badgesHtml += `<div class="grade-letter-badge ${extraClass}">${escapeHtml(displayLetter)}</div>`;
+      }
+      return `
+        <div class="grade-section">
+          <div class="grade-title"><i class="fas fa-star"></i> Grade Summary</div>
+          <div class="grade-letters-container">
+            ${badgesHtml}
+          </div>
+        </div>
+      `;
+    }
+    
+    function createTopperCard(student, rank) {
+      const rankDetail = getRankDetails(rank);
+      const rankClass = `rank-${rank}`;
+      
+      let photoHtml;
+      const hasPhoto = student['Photo URL'] && String(student['Photo URL']).trim().startsWith('http');
+      if (hasPhoto) {
+        photoHtml = `<img src="${student['Photo URL']}" class="student-photo" alt="student" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'default-photo\\'><i class=\\'fas fa-user-graduate\\' style=\\'font-size:70px;color:#e67e22;\\'></i></div>';">`;
+      } else {
+        photoHtml = `<div class="default-photo"><i class="fas fa-user-graduate" style="font-size:70px;color:#e67e22;"></i></div>`;
+      }
+      
+      const percentFormatted = student.Percentage;
+      const gradeSectionHtml = renderGradeSection(student.gradeLetters);
+      
+      return `
+        <div class="topper-card">
+          <div class="medal-badge ${rankClass}">
+            <i class="${rankDetail.icon} rank-icon"></i>
+            <div class="rank-number">#${rank}</div>
+            <div class="rank-title">RANK</div>
+          </div>
+          <div class="photo-container">
+            ${photoHtml}
+          </div>
+          <div class="info-section">
+            <div class="student-name">${escapeHtml(student['Name of student'])}</div>
+            <div style="text-align:center;"><span class="roll-no"><i class="fas fa-id-card"></i> Roll: ${escapeHtml(student['Roll No'])}</span></div>
+            <div class="percentage">${percentFormatted}%</div>
+            ${gradeSectionHtml}
+            <div class="details-grid">
+              <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-chart-line"></i> Total Marks</div>
+                <div class="detail-value">${escapeHtml(student['Total marks scored'])}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-medal"></i> Division</div>
+                <div class="detail-value">${escapeHtml(student['Division'])}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-calendar-check"></i> Attendance</div>
+                <div class="detail-value">${escapeHtml(student['Attendance'])}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label"><i class="fas fa-book-open"></i> Exam</div>
+                <div class="detail-value">${escapeHtml(student['Name of Examination'])}</div>
+              </div>
+            </div>
+            <div class="detail-item" style="margin-top: 12px; background: #fff2e0;">
+              <div class="detail-label"><i class="fas fa-heart"></i> Proud Parents</div>
+              <div class="detail-value" style="font-size: 0.85rem;">
+                ${escapeHtml(student['Father\'s Name'])} ${student['Mother\'s Name'] ? '& ' + escapeHtml(student['Mother\'s Name']) : ''}
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderToppers(className) {
+      const contentArea = document.getElementById('contentArea');
+      if (!contentArea) return;
+      const classData = allClassData[className];
+      if (!classData || classData.length === 0) {
+        contentArea.innerHTML = `<div class="no-data"><i class="fas fa-trophy"></i><h3>No toppers found</h3><p>No Rank 1–3 records are available for ${className}.</p></div>`;
+        return;
+      }
+      const rank1 = classData.filter(s => s.Rank === 1);
+      const rank2 = classData.filter(s => s.Rank === 2);
+      const rank3 = classData.filter(s => s.Rank === 3);
+      let html = '<div class="toppers-grid">';
+      rank1.forEach(s => { html += createTopperCard(s, 1); });
+      rank2.forEach(s => { html += createTopperCard(s, 2); });
+      rank3.forEach(s => { html += createTopperCard(s, 3); });
+      html += '</div>';
+      contentArea.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '—';
+      const div = document.createElement('div');
+      div.textContent = String(text);
+      return div.innerHTML;
+    }
+
+    function showNoData(message) {
+      const contentArea = document.getElementById('contentArea');
+      if (contentArea) {
+        contentArea.innerHTML = `<div class="no-data"><i class="fas fa-chalkboard"></i><h3>Information</h3><p>${message}</p></div>`;
+      }
+    }
+
+    function onError(error) {
+      console.error("Error loading data:", error);
+      showNoData("Could not load toppers. Please check sheet permissions or data format. Error: " + (error.message || error));
+    }
+</script>
+</body>
+</html>

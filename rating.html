@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Performance Ratings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+      padding: 30px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 20px;
+      margin-bottom: 25px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1e3c72;
+    }
+    .header h1 span {
+      color: #2a5298;
+    }
+    .header .subtitle {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 25px;
+      padding: 16px 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      align-items: flex-end;
+    }
+    .controls .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .controls label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .controls select, .controls input {
+      padding: 8px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', Arial, sans-serif;
+      background: white;
+      min-width: 180px;
+      transition: border-color 0.2s;
+    }
+    .controls select:focus, .controls input:focus {
+      outline: none;
+      border-color: #2a5298;
+      box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+    }
+    .btn {
+      padding: 9px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: #2a5298;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1e3c72;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(42,82,152,0.25);
+    }
+    .btn-success {
+      background: #0ea5e9;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(14,165,233,0.25);
+    }
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+    }
+    .btn-warning:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+    .btn-purple {
+      background: #7c3aed;
+      color: white;
+    }
+    .btn-purple:hover {
+      background: #6d28d9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+    .info-box {
+      background: #f1f5f9;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 20px;
+      border-left: 4px solid #2a5298;
+    }
+    .info-box strong {
+      color: #1e293b;
+    }
+    .info-box ul {
+      margin: 6px 0 0 18px;
+      list-style: disc;
+      line-height: 1.6;
+    }
+    .iframe-wrapper {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+      min-height: 500px;
+    }
+    .iframe-wrapper iframe {
+      width: 100%;
+      min-height: 600px;
+      border: none;
+    }
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+    .loading .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #2a5298;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    @media (max-width: 700px) {
+      .container { padding: 15px; }
+      .header h1 { font-size: 18px; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .controls select, .controls input { min-width: auto; width: 100%; }
+      .btn-group { margin-left: 0; width: 100%; }
+      .btn-group .btn { flex: 1; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>📊 <span>Student Performance</span> Ratings</h1>
+      <div class="subtitle">Based on Result Subjects • Full Marks: 80</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="field">
+      <label for="classSelect">📚 Select Class</label>
+      <select id="classSelect">
+        <option value="">— Select Class —</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="rollInput">🔢 Roll Number</label>
+      <input type="text" id="rollInput" placeholder="e.g. 1, 2, 3..." style="min-width:120px;">
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="viewIndividual()">👤 Individual Rating</button>
+      <button class="btn btn-success" onclick="viewSummary()">📋 Class Summary</button>
+      <button class="btn btn-purple" onclick="viewAllCards()">📄 All Rating Cards</button>
+    </div>
+  </div>
+
+  <div class="info-box" id="infoBox">
+    <strong>💡 How to use:</strong>
+    Select a class, then either:
+    <ul>
+      <li><strong>Individual Rating</strong> — Enter a roll number to view detailed rating card (one page per student).</li>
+      <li><strong>Class Summary</strong> — View all students in a compact A4 landscape table (1-2 pages).</li>
+      <li><strong>All Rating Cards</strong> — View detailed rating cards for ALL students (each on a separate A4 portrait page).</li>
+    </ul>
+  </div>
+
+  <div class="iframe-wrapper" id="iframeWrapper">
+    <div class="loading" id="loadingPlaceholder">
+      <div class="spinner"></div>
+      <p style="margin-top:15px;">Select a class and click a button to view ratings</p>
+    </div>
+    <iframe id="resultFrame" style="display:none;"></iframe>
+  </div>
+
+  <div class="footer">
+    Friendship Educational Academy • Performance Rating System • v1.0
+  </div>
+</div>
+
+<script src="js/bridge.js"></script>
+<script>
+  // Load classes on page load
+  window.onload = function() {
+    google.script.run
+      .withSuccessHandler(populateClasses)
+      .getClassList();
+  };
+
+  function populateClasses(classes) {
+    var select = document.getElementById('classSelect');
+    classes.forEach(function(cls) {
+      var opt = document.createElement('option');
+      opt.value = cls;
+      opt.textContent = cls;
+      select.appendChild(opt);
+    });
+  }
+
+  function getSelectedClass() {
+    var sel = document.getElementById('classSelect');
+    return sel.value;
+  }
+
+  function getRollNumber() {
+    return document.getElementById('rollInput').value.trim();
+  }
+
+  function showLoading() {
+    document.getElementById('loadingPlaceholder').style.display = 'block';
+    document.getElementById('resultFrame').style.display = 'none';
+  }
+
+  function showResult(html) {
+    document.getElementById('loadingPlaceholder').style.display = 'none';
+    var frame = document.getElementById('resultFrame');
+    frame.style.display = 'block';
+    frame.srcdoc = html;
+  }
+
+  function handleResponse(response) {
+    // If response is a string, treat as HTML
+    if (typeof response === 'string') {
+      showResult(response);
+      return;
+    }
+    
+    // If response is an object
+    if (typeof response === 'object' && response !== null) {
+      // Check for error
+      if (response.error) {
+        alert('Error: ' + response.error);
+        showLoading();
+        return;
+      }
+      // Check for success with html
+      if (response.success && response.html) {
+        showResult(response.html);
+        return;
+      }
+      // If response has html directly
+      if (response.html) {
+        showResult(response.html);
+        return;
+      }
+    }
+    
+    // If we get here, something went wrong
+    alert('Unexpected response format. Please check the console.');
+    console.log('Response:', response);
+    showLoading();
+  }
+
+  function viewIndividual() {
+    var cls = getSelectedClass();
+    var roll = getRollNumber();
+    if (!cls) { alert('Please select a class.'); return; }
+    if (!roll) { alert('Please enter a roll number.'); return; }
+
+    showLoading();
+    google.script.run
+      .withSuccessHandler(handleResponse)
+      .withFailureHandler(function(err) { 
+        alert('Error: ' + err); 
+        showLoading(); 
+      })
+      .generateStudentRatingHTML(cls, roll);
+  }
+
+  function viewSummary() {
+    var cls = getSelectedClass();
+    if (!cls) { alert('Please select a class.'); return; }
+
+    showLoading();
+    google.script.run
+      .withSuccessHandler(handleResponse)
+      .withFailureHandler(function(err) { 
+        alert('Error: ' + err); 
+        showLoading(); 
+      })
+      .generateClassRatingSummaryHTML(cls);
+  }
+
+  function viewAllCards() {
+    var cls = getSelectedClass();
+    if (!cls) { alert('Please select a class.'); return; }
+
+    showLoading();
+    google.script.run
+      .withSuccessHandler(handleResponse)
+      .withFailureHandler(function(err) { 
+        alert('Error: ' + err); 
+        showLoading(); 
+      })
+      .generateAllStudentsRatingCards(cls);
+  }
+
+  // Enter key to trigger individual rating
+  document.getElementById('rollInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') viewIndividual();
+  });
+</script>
+
+</body>
+</html>

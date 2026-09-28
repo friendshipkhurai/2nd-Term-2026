@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Friendship Educational Academy - Examination Marksheet</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', Arial, sans-serif; padding: 10mm; }
+        @page { size: A4 portrait; margin: 10mm; }
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #6C5CE7; padding-bottom: 10px; }
+        .header h2 { color: #6C5CE7; }
+        .student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .info-item { background: #f5f5f5; padding: 8px; border-radius: 5px; }
+        .info-item strong { display: block; color: #6C5CE7; font-size: 11px; }
+        .marks-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .marks-table th { background: #6C5CE7; color: white; padding: 8px; text-align: left; }
+        .marks-table td { padding: 6px 8px; border-bottom: 1px solid #ddd; }
+        .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .summary-item { background: #f5f5f5; padding: 8px; text-align: center; border-radius: 5px; }
+        .summary-item strong { display: block; color: #e74c3c; }
+        .footer { text-align: center; margin-top: 20px; font-size: 9px; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h2>${examName}</h2>
+        <h3>${studentClass}</h3>
+      </div>
+      ${studentInfo ? studentInfo.outerHTML : ''}
+      ${marksTable ? marksTable.outerHTML : ''}
+      ${summary ? summary.outerHTML : ''}
+      <div class="footer">
+        <p>Friendship Educational Academy - Official Marksheet</p>
+        <p>Generated: ${new Date().toLocaleString()}</p>
+      </div>
+      <script src="js/bridge.js"></script>
+<script>window.onload = () => setTimeout(() => window.print(), 500);<\/script>
+    </body>
+    </html>
+  `;
+  
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+}
+
+
+// =====================================================
+// RETURN FROM RESULT SCREEN TO SEARCH SCREEN
+// =====================================================
+document.addEventListener('DOMContentLoaded', function () {
+  const backBtn = document.getElementById('backSearchBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function () {
+      document.getElementById('resultPage').classList.remove('show-page');
+      document.getElementById('resultContainer').style.display = 'none';
+      document.getElementById('searchPage').classList.remove('hide-page');
+      const footer = document.getElementById('siteFooter');
+      if (footer) footer.classList.remove('hide-footer');
+      document.getElementById('error').style.display = 'none';
+      window.scrollTo(0, 0);
+    });
+  }
+});
+</script>
+</body>
+</html>
