@@ -1,318 +1,509 @@
 /****************************************************
- * FEA GITHUB BRIDGE
- * JSONP VERSION
+ * FRIENDSHIP EDUCATIONAL ACADEMY
+ * GITHUB PAGES → GOOGLE APPS SCRIPT BRIDGE
+ *
+ * File:
+ *     /js/bridge.js
+ *
+ * This replaces google.script.run on GitHub Pages.
  ****************************************************/
 
 (function () {
 
-  console.log("FEA bridge.js loaded");
+    "use strict";
+
+    console.log("FEA bridge.js: STARTING");
 
 
-  var API_URL =
-    "https://script.google.com/macros/s/AKfycbzWLvO2ADPj3hWJsX-1Je-wC0ax30C1nEUp1E0xfpSc4Y-bDpBP8OXT-2j_3PyTQAgvZA/exec";
+    /************************************************
+     * YOUR GOOGLE APPS SCRIPT WEB APP URL
+     ************************************************/
+
+    var API_URL =
+        "https://script.google.com/macros/s/AKfycbzWLvO2ADPj3hWJsX-1Je-wC0ax30C1nEUp1E0xfpSc4Y-bDpBP8OXT-2j_3PyTQAgvZA/exec";
 
 
-  var requestCounter = 0;
+    var requestCounter = 0;
 
 
-  function createRunner() {
+    /************************************************
+     * CREATE GOOGLE.SCRIPT.RUN COMPATIBILITY LAYER
+     ************************************************/
 
-    var successHandler = null;
-    var failureHandler = null;
+    function createRunner() {
 
+        var runner = {};
 
-    var runner = {};
-
-
-    runner.withSuccessHandler = function (fn) {
-
-      successHandler =
-        typeof fn === "function"
-          ? fn
-          : null;
-
-      return runner;
-    };
+        var successHandler = null;
+        var failureHandler = null;
 
 
-    runner.withFailureHandler = function (fn) {
+        /********************************************
+         * withSuccessHandler()
+         ********************************************/
 
-      failureHandler =
-        typeof fn === "function"
-          ? fn
-          : null;
+        runner.withSuccessHandler = function (callback) {
 
-      return runner;
-    };
+            successHandler =
+                typeof callback === "function"
+                    ? callback
+                    : null;
 
-
-    runner.withUserObject = function () {
-
-      return runner;
-    };
-
-
-    return new Proxy(runner, {
-
-      get: function (target, property) {
-
-        /*
-         * Existing methods
-         */
-        if (property in target) {
-          return target[property];
-        }
-
-
-        /*
-         * Apps Script server function
-         */
-        return function () {
-
-          var args =
-            Array.prototype.slice.call(
-              arguments
-            );
-
-
-          callApi(
-            property,
-            args,
-            successHandler,
-            failureHandler
-          );
-
-
-          return runner;
+            return runner;
         };
 
-      }
 
-    });
+        /********************************************
+         * withFailureHandler()
+         ********************************************/
 
-  }
+        runner.withFailureHandler = function (callback) {
 
+            failureHandler =
+                typeof callback === "function"
+                    ? callback
+                    : null;
 
-  function callApi(
-    functionName,
-    args,
-    successHandler,
-    failureHandler
-  ) {
-
-    requestCounter++;
-
-    var callbackName =
-      "__feaCallback" +
-      requestCounter;
+            return runner;
+        };
 
 
-    var script =
-      document.createElement("script");
+        /********************************************
+         * withUserObject()
+         ********************************************/
+
+        runner.withUserObject = function () {
+
+            return runner;
+        };
 
 
-    var finished = false;
+        /********************************************
+         * PROXY
+         *
+         * Any unknown method becomes an Apps Script
+         * server-side function.
+         ********************************************/
+
+        return new Proxy(runner, {
+
+            get: function (target, property) {
+
+                if (property in target) {
+
+                    return target[property];
+
+                }
 
 
-    window[callbackName] =
-      function (response) {
+                return function () {
 
-        finished = true;
-
-
-        try {
-
-          if (
-            response &&
-            response.success
-          ) {
-
-            console.log(
-              "FEA SUCCESS:",
-              functionName,
-              response.result
-            );
+                    var args =
+                        Array.prototype.slice.call(
+                            arguments
+                        );
 
 
-            if (successHandler) {
-              successHandler(
-                response.result
-              );
+                    callGoogleAppsScript(
+                        property,
+                        args,
+                        successHandler,
+                        failureHandler
+                    );
+
+
+                    return runner;
+
+                };
+
             }
 
-          } else {
-
-            var error = {
-
-              message:
-                response &&
-                response.error
-                  ? response.error
-                  : "Unknown Apps Script error"
-
-            };
-
-
-            console.error(
-              "FEA ERROR:",
-              functionName,
-              error
-            );
-
-
-            if (failureHandler) {
-              failureHandler(error);
-            }
-
-          }
-
-        } finally {
-
-          cleanup();
-
-        }
-
-      };
-
-
-    function cleanup() {
-
-      try {
-        delete window[callbackName];
-      } catch (e) {}
-
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+        });
 
     }
 
 
-    script.onerror =
-      function () {
+    /************************************************
+     * CALL GOOGLE APPS SCRIPT
+     ************************************************/
 
-        if (finished) return;
+    function callGoogleAppsScript(
+        functionName,
+        args,
+        successHandler,
+        failureHandler
+    ) {
 
-        finished = true;
+        requestCounter++;
 
-        var error = {
-          message:
-            "Unable to connect to Google Apps Script."
-        };
-
-
-        console.error(
-          "FEA CONNECTION ERROR:",
-          functionName
-        );
+        var callbackName =
+            "__FEA_CALLBACK_" +
+            Date.now() +
+            "_" +
+            requestCounter;
 
 
-        if (failureHandler) {
-          failureHandler(error);
+        var script =
+            document.createElement("script");
+
+
+        var completed = false;
+
+
+        /********************************************
+         * GLOBAL JSONP CALLBACK
+         ********************************************/
+
+        window[callbackName] =
+            function (response) {
+
+                if (completed) {
+
+                    return;
+
+                }
+
+                completed = true;
+
+
+                console.log(
+                    "FEA response:",
+                    functionName,
+                    response
+                );
+
+
+                try {
+
+                    if (
+                        response &&
+                        response.success === true
+                    ) {
+
+                        if (
+                            typeof successHandler ===
+                            "function"
+                        ) {
+
+                            successHandler(
+                                response.result
+                            );
+
+                        }
+
+                    } else {
+
+                        var error = {
+
+                            message:
+                                response &&
+                                response.error
+                                    ? response.error
+                                    : "Unknown Google Apps Script error"
+
+                        };
+
+
+                        console.error(
+                            "FEA API ERROR:",
+                            functionName,
+                            error
+                        );
+
+
+                        if (
+                            typeof failureHandler ===
+                            "function"
+                        ) {
+
+                            failureHandler(error);
+
+                        }
+
+                    }
+
+                } catch (callbackError) {
+
+                    console.error(
+                        "FEA callback error:",
+                        callbackError
+                    );
+
+                } finally {
+
+                    cleanup();
+
+                }
+
+            };
+
+
+        /********************************************
+         * CLEANUP
+         ********************************************/
+
+        function cleanup() {
+
+            try {
+
+                delete window[callbackName];
+
+            } catch (e) {
+
+                window[callbackName] =
+                    undefined;
+
+            }
+
+
+            if (script.parentNode) {
+
+                script.parentNode.removeChild(
+                    script
+                );
+
+            }
+
         }
 
 
-        cleanup();
+        /********************************************
+         * NETWORK ERROR
+         ********************************************/
 
-      };
+        script.onerror =
+            function () {
+
+                if (completed) {
+
+                    return;
+
+                }
+
+                completed = true;
 
 
-    var params =
-      "?api=github" +
-      "&functionName=" +
-      encodeURIComponent(functionName) +
-      "&args=" +
-      encodeURIComponent(
-        JSON.stringify(args)
-      ) +
-      "&callback=" +
-      encodeURIComponent(callbackName);
+                var error = {
+
+                    message:
+                        "Cannot connect to Google Apps Script.\n" +
+                        "Check the Apps Script Web App deployment and URL."
+
+                };
 
 
-    script.src =
-      API_URL + params;
+                console.error(
+                    "FEA NETWORK ERROR:",
+                    functionName
+                );
+
+
+                if (
+                    typeof failureHandler ===
+                    "function"
+                ) {
+
+                    failureHandler(error);
+
+                }
+
+
+                cleanup();
+
+            };
+
+
+        /********************************************
+         * BUILD REQUEST
+         ********************************************/
+
+        var query =
+            "?api=github" +
+            "&functionName=" +
+            encodeURIComponent(
+                functionName
+            ) +
+            "&args=" +
+            encodeURIComponent(
+                JSON.stringify(args)
+            ) +
+            "&callback=" +
+            encodeURIComponent(
+                callbackName
+            );
+
+
+        var requestURL =
+            API_URL + query;
+
+
+        console.log(
+            "FEA REQUEST:",
+            functionName,
+            args
+        );
+
+
+        /********************************************
+         * SEND JSONP REQUEST
+         ********************************************/
+
+        script.src =
+            requestURL;
+
+
+        document.head.appendChild(
+            script
+        );
+
+    }
+
+
+    /************************************************
+     * INSTALL google.script.run
+     ************************************************/
+
+    window.google =
+        window.google || {};
+
+
+    window.google.script =
+        window.google.script || {};
+
+
+    window.google.script.run =
+        createRunner();
 
 
     console.log(
-      "FEA REQUEST:",
-      functionName
+        "FEA bridge.js: google.script.run READY"
     );
 
 
-    document.head.appendChild(script);
+    /************************************************
+     * DIRECT API FUNCTION
+     *
+     * Optional:
+     *
+     * feaCall("getClassList")
+     *
+     * feaCall("getStudentResult", "IX(Nine)", "1")
+     ************************************************/
 
-  }
+    window.feaCall =
+        function (functionName) {
 
-
-  /*
-   * Replace google.script.run
-   */
-  window.google =
-    window.google || {};
-
-  window.google.script =
-    window.google.script || {};
-
-
-  /*
-   * If GitHub page does not have native
-   * Apps Script API, install our bridge.
-   */
-  window.google.script.run =
-    createRunner();
+            var args =
+                Array.prototype.slice.call(
+                    arguments,
+                    1
+                );
 
 
-  /*
-   * Public connection test.
-   */
-  window.testFEAConnection =
-    function () {
+            return new Promise(
+                function (resolve, reject) {
 
-      console.log(
-        "Testing Google Sheet connection..."
-      );
+                    callGoogleAppsScript(
+                        functionName,
+                        args,
+                        resolve,
+                        reject
+                    );
 
-
-      var success =
-        function (classes) {
-
-          console.log(
-            "CONNECTED TO GOOGLE SHEET",
-            classes
-          );
-
-
-          alert(
-            "CONNECTED!\n\n" +
-            "Classes received:\n" +
-            classes.join(", ")
-          );
+                }
+            );
 
         };
 
 
-      var failure =
-        function (error) {
+    /************************************************
+     * CONNECTION TEST
+     ************************************************/
 
-          console.error(
-            error
-          );
+    window.testFEAConnection =
+        function () {
+
+            console.log(
+                "FEA: Testing connection..."
+            );
 
 
-          alert(
-            "CONNECTION FAILED:\n\n" +
-            error.message
-          );
+            window.google.script.run
+
+                .withSuccessHandler(
+                    function (classes) {
+
+                        console.log(
+                            "FEA: GOOGLE APPS SCRIPT CONNECTED"
+                        );
+
+                        console.log(
+                            "Classes:",
+                            classes
+                        );
+
+
+                        alert(
+                            "CONNECTED TO GOOGLE APPS SCRIPT!\n\n" +
+                            "Classes received:\n\n" +
+                            classes.join(
+                                "\n"
+                            )
+                        );
+
+                    }
+                )
+
+                .withFailureHandler(
+                    function (error) {
+
+                        console.error(
+                            "FEA: CONNECTION FAILED",
+                            error
+                        );
+
+
+                        alert(
+                            "CONNECTION FAILED\n\n" +
+                            (
+                                error &&
+                                error.message
+                                    ? error.message
+                                    : error
+                            )
+                        );
+
+                    }
+                )
+
+                .getClassList();
 
         };
 
 
-      window.google.script.run
-        .withSuccessHandler(success)
-        .withFailureHandler(failure)
-        .getClassList();
+    /************************************************
+     * SIMPLE PAGE LOAD TEST
+     ************************************************/
 
-    };
+    window.feaBridgeStatus =
+        function () {
+
+            return {
+
+                bridge: true,
+
+                apiURL: API_URL,
+
+                googleScriptRun:
+                    !!(
+                        window.google &&
+                        window.google.script &&
+                        window.google.script.run
+                    )
+
+            };
+
+        };
 
 
 })();
