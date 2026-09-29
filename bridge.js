@@ -1,343 +1,290 @@
 /****************************************************
  * FRIENDSHIP EDUCATIONAL ACADEMY
- * GITHUB → GOOGLE APPS SCRIPT BRIDGE
+ * GITHUB PAGES → GOOGLE APPS SCRIPT
  ****************************************************/
 
 const FEA_API_URL =
   "https://script.google.com/macros/s/AKfycbzWLvO2ADPj3hWJsX-1Je-wC0ax30C1nEUp1E0xfpSc4Y-bDpBP8OXT-2j_3PyTQAgvZA/exec";
 
 
-/****************************************************
- * INTERNAL API CALL
- ****************************************************/
+(function () {
 
-function feaApiCall_(functionName, args) {
-
-  return fetch(FEA_API_URL, {
-
-    method: "POST",
-
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-
-    body: JSON.stringify({
-
-      functionName: functionName,
-
-      args: Array.isArray(args)
-        ? args
-        : []
-
-    })
-
-  })
-
-  .then(function(response) {
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Google Apps Script returned HTTP " +
-        response.status
-      );
-
-    }
-
-    return response.text();
-
-  })
-
-  .then(function(text) {
-
-    var response;
-
-    try {
-
-      response = JSON.parse(text);
-
-    } catch (e) {
-
-      console.error(
-        "Invalid response from Google Apps Script:",
-        text
-      );
-
-      throw new Error(
-        "Invalid response received from Google Apps Script."
-      );
-
-    }
-
-
-    if (!response.success) {
-
-      throw new Error(
-        response.error ||
-        "Google Apps Script request failed."
-      );
-
-    }
-
-
-    return response.result;
-
-  });
-
-}
-
-
-/****************************************************
- * google.script.run COMPATIBILITY LAYER
- *
- * This allows your existing HTML files to continue
- * using:
- *
- * google.script.run
- *   .withSuccessHandler(...)
- *   .withFailureHandler(...)
- *   .functionName(...)
- ****************************************************/
-
-(function() {
-
+  /*
+   * If this page is actually running inside Apps Script,
+   * don't replace the real google.script.run.
+   */
   if (
     window.google &&
     window.google.script &&
     window.google.script.run
   ) {
-
-    // Already running inside Apps Script.
+    console.log("FEA: Native Apps Script environment detected.");
     return;
-
   }
 
 
-  window.google = window.google || {};
+  console.log("FEA: GitHub API bridge loaded.");
 
-  window.google.script =
-    window.google.script || {};
+
+  window.google = window.google || {};
+  window.google.script = window.google.script || {};
 
 
   function Runner() {
 
-    this._successHandler = null;
+    this.successHandler = null;
+    this.failureHandler = null;
 
-    this._failureHandler = null;
+    return new Proxy(this, {
+
+      get: function (target, property) {
+
+        /*
+         * Existing chain methods
+         */
+        if (property === "withSuccessHandler") {
+
+          return function (callback) {
+
+            target.successHandler =
+              typeof callback === "function"
+                ? callback
+                : null;
+
+            return target;
+          };
+        }
+
+
+        if (property === "withFailureHandler") {
+
+          return function (callback) {
+
+            target.failureHandler =
+              typeof callback === "function"
+                ? callback
+                : null;
+
+            return target;
+          };
+        }
+
+
+        if (property === "withUserObject") {
+
+          return function () {
+            return target;
+          };
+        }
+
+
+        /*
+         * Any other property is treated as
+         * the Apps Script server function.
+         */
+        return function () {
+
+          var args =
+            Array.prototype.slice.call(arguments);
+
+          callFEA(
+            property,
+            args,
+            target.successHandler,
+            target.failureHandler
+          );
+
+          return target;
+        };
+      }
+    });
+  }
+
+
+  function callFEA(
+    functionName,
+    args,
+    successHandler,
+    failureHandler
+  ) {
+
+    console.log(
+      "FEA API →",
+      functionName,
+      args
+    );
+
+
+    fetch(FEA_API_URL, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+
+      body: JSON.stringify({
+
+        functionName: functionName,
+
+        args: args
+
+      })
+
+    })
+
+    .then(function (response) {
+
+      console.log(
+        "FEA HTTP:",
+        response.status,
+        response.url
+      );
+
+      if (!response.ok) {
+
+        throw new Error(
+          "HTTP " + response.status
+        );
+      }
+
+      return response.text();
+    })
+
+
+    .then(function (text) {
+
+      console.log(
+        "FEA RAW RESPONSE:",
+        text
+      );
+
+
+      var data;
+
+      try {
+
+        data = JSON.parse(text);
+
+      } catch (e) {
+
+        throw new Error(
+          "Google Apps Script returned invalid JSON: " +
+          text.substring(0, 500)
+        );
+      }
+
+
+      if (!data.success) {
+
+        throw new Error(
+          data.error ||
+          "Google Apps Script request failed."
+        );
+      }
+
+
+      if (successHandler) {
+
+        successHandler(data.result);
+
+      }
+
+    })
+
+
+    .catch(function (error) {
+
+      console.error(
+        "FEA API ERROR:",
+        functionName,
+        error
+      );
+
+
+      if (failureHandler) {
+
+        failureHandler({
+
+          message:
+            error.message ||
+            String(error),
+
+          name:
+            error.name ||
+            "FEA_API_ERROR"
+
+        });
+
+      }
+
+    });
 
   }
 
 
-  Runner.prototype.withSuccessHandler =
-    function(callback) {
+  window.google.script.run =
+    new Runner();
 
-      this._successHandler =
-        typeof callback === "function"
-          ? callback
-          : null;
 
-      return this;
+  /*
+   * Direct test helper.
+   */
+  window.testFEAConnection = function () {
 
-    };
+    console.log(
+      "Testing FEA Apps Script connection..."
+    );
 
 
-  Runner.prototype.withFailureHandler =
-    function(callback) {
+    fetch(FEA_API_URL, {
 
-      this._failureHandler =
-        typeof callback === "function"
-          ? callback
-          : null;
+      method: "GET",
 
-      return this;
+      redirect: "follow"
 
-    };
+    })
 
+    .then(function (response) {
 
-  Runner.prototype.withUserObject =
-    function() {
-
-      // Compatibility only.
-      return this;
-
-    };
-
-
-  Runner.prototype._execute =
-    function(functionName, args) {
-
-      var self = this;
-
-
-      feaApiCall_(functionName, args)
-
-        .then(function(result) {
-
-          if (self._successHandler) {
-
-            self._successHandler(result);
-
-          }
-
-        })
-
-        .catch(function(error) {
-
-          console.error(
-            "FEA API Error:",
-            functionName,
-            error
-          );
-
-
-          if (self._failureHandler) {
-
-            self._failureHandler({
-
-              message:
-                error.message ||
-                String(error),
-
-              name:
-                error.name ||
-                "APIError"
-
-            });
-
-          } else {
-
-            console.error(
-              "Unhandled FEA API error:",
-              error
-            );
-
-          }
-
-        });
-
-    };
-
-
-  var proxy = new Proxy(
-
-    new Runner(),
-
-    {
-
-      get: function(target, property) {
-
-        // Existing compatibility methods
-        if (property in target) {
-
-          return target[property];
-
-        }
-
-
-        // Any other property is treated as
-        // an Apps Script server function.
-
-        return function() {
-
-          var args =
-            Array.prototype.slice.call(
-              arguments
-            );
-
-
-          target._execute(
-            property,
-            args
-          );
-
-          // Return target so that chained calls
-          // continue to work.
-          return target;
-
-        };
-
-      }
-
-    }
-
-  );
-
-
-  window.google.script.run = proxy;
-
-
-})();
-
-
-/****************************************************
- * DIRECT API HELPER
- *
- * Optional use:
- *
- * feaCall("getClassList")
- * feaCall("getStudentResult", cls, roll)
- ****************************************************/
-
-function feaCall(functionName) {
-
-  var args =
-    Array.prototype.slice.call(arguments, 1);
-
-  return feaApiCall_(
-    functionName,
-    args
-  );
-
-}
-
-
-/****************************************************
- * CONNECTION TEST
- ****************************************************/
-
-function testFEAConnection() {
-
-  return fetch(FEA_API_URL, {
-
-    method: "GET"
-
-  })
-
-  .then(function(response) {
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Connection failed: HTTP " +
+      console.log(
+        "GET status:",
         response.status
       );
 
-    }
+      return response.text();
 
-    return response.json();
+    })
 
-  })
+    .then(function (text) {
 
-  .then(function(data) {
+      console.log(
+        "GET response:",
+        text
+      );
 
-    console.log(
-      "FEA Google Apps Script connection:",
-      data
-    );
+      alert(
+        "FEA connection response:\n\n" +
+        text
+      );
 
-    return data;
+    })
 
-  })
+    .catch(function (error) {
 
-  .catch(function(error) {
+      console.error(
+        "FEA CONNECTION ERROR:",
+        error
+      );
 
-    console.error(
-      "FEA Google Sheets connection failed:",
-      error
-    );
+      alert(
+        "FEA connection failed:\n\n" +
+        error.message
+      );
 
-    throw error;
+    });
 
-  });
+  };
 
-}
+
+})();
