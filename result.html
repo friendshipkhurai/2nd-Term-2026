@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,7 +17,26 @@
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-  <script src="js/bridge.js"></script>
+  <script>
+(function(){
+  const API_URL="https://script.google.com/macros/s/AKfycbzWLvO2ADPj3hWJsX-1Je-wC0ax30C1nEUp1E0xfpSc4Y-bDpBP8OXT-2j_3PyTQAgvZA/exec";
+  let n=0;
+  function call(fn,args,ok,fail){
+    const cb="fea_cb_"+Date.now()+"_"+(++n);
+    const sc=document.createElement('script');
+    let done=false;
+    function clean(){try{delete window[cb]}catch(e){} if(sc.parentNode)sc.parentNode.removeChild(sc);}
+    window[cb]=function(r){if(done)return;done=true;try{if(r&&r.success){if(ok)ok(r.result)}else{if(fail)fail({message:r&&r.error?r.error:'Unknown Apps Script error'})}}catch(e){if(fail)fail({message:e.message})}clean()};
+    sc.onerror=function(){if(done)return;done=true;if(fail)fail({message:'Unable to connect to Google Apps Script. Check Web App URL/deployment.'});clean()};
+    sc.src=API_URL+'?api=github&functionName='+encodeURIComponent(fn)+'&args='+encodeURIComponent(JSON.stringify(args||[]))+'&callback='+encodeURIComponent(cb);
+    document.head.appendChild(sc);
+  }
+  const runner={_ok:null,_fail:null,withSuccessHandler:function(f){this._ok=typeof f==='function'?f:null;return this},withFailureHandler:function(f){this._fail=typeof f==='function'?f:null;return this},withUserObject:function(){return this}};
+  window.google=window.google||{}; window.google.script=window.google.script||{};
+  window.google.script.run=new Proxy(runner,{get:function(t,p){if(p in t)return t[p];return function(){const a=[].slice.call(arguments),ok=t._ok,fail=t._fail;t._ok=null;t._fail=null;call(p,a,ok,fail);return t}}});
+  console.log('FEA GitHub bridge ready');
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1074,7 +1094,7 @@
         <h3 id="studentClass"></h3>
       </div>
 
-      <!-- âœ… Student Photo Section -->
+      <!-- Ã¢Å“â€¦ Student Photo Section -->
       <div class="student-photo" id="studentPhoto"></div>
 
       <div class="student-info" id="studentInfo"></div>
